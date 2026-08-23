@@ -1,0 +1,34 @@
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS timeline_events (
+  id TEXT PRIMARY KEY,
+  event_date TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  emoji TEXT NOT NULL DEFAULT '♥',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS stories (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS photos (
+  id TEXT PRIMARY KEY,
+  public_path TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL DEFAULT '',
+  caption TEXT NOT NULL DEFAULT '',
+  event_date TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT OR IGNORE INTO settings(key,value) VALUES ('start_date','2024-02-14');
+INSERT OR IGNORE INTO settings(key,value) VALUES ('couple_name','Our Little Universe');

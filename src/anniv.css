@@ -1,0 +1,17 @@
+.anniGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.anni{padding:34px 30px 28px;text-align:center;position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease}
+.anni::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -45%,#ffd4e45c,transparent 65%);pointer-events:none}
+.anni:hover{transform:translateY(-5px);box-shadow:0 34px 90px #6b3a4e1f}
+.anni.today{outline:2px solid #f48cad66}
+.anniTop{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px}
+.anniEmoji{width:58px;height:58px;display:grid;place-items:center;font-size:27px;border-radius:19px;background:linear-gradient(135deg,#ffe3ee,#efe4ff);border:1px solid #ffffffd9;box-shadow:0 10px 24px #5a304014}
+.anniDate{font-size:13px;color:#bd718d;background:#fff;border:1px solid #ffd4e480;padding:6px 12px;border-radius:999px;font-weight:700}
+.anni h3{margin:0 0 14px;font-size:24px}
+.anniDays{display:flex;align-items:baseline;justify-content:center;gap:8px;line-height:1}
+.anniDays b{font-size:64px;letter-spacing:-.03em;background:linear-gradient(110deg,#d56e9a,#8b6dd1);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.anniDays span{color:#97838c;font-size:15px;font-weight:750}
+.anni p{margin:12px 0 0}
+.anniMsg{font-size:17px;font-weight:800;color:#d56e9a;margin:6px 0 0!important}
+.anniBar{height:9px;border-radius:999px;background:#f7ebf1;overflow:hidden;margin:18px auto 8px;max-width:300px}
+.anniBar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#f48cad,#bd8de7)}
+@media(max-width:760px){.anniGrid{grid-template-columns:1fr}.anniDays b{font-size:54px}}

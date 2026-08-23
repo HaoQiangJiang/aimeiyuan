@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# wrangler local state
+.wrangler/
+
+# env & secrets
+.env
+.env.*
+.dev.vars
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+photos/.DS_Store
+*.baiduyun*
+.DS_Store

@@ -1,0 +1,16 @@
+.intro{position:fixed;inset:0;z-index:999;background:#070512;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer}
+.intro.bye{opacity:0;pointer-events:none;transition:opacity .85s ease}
+.iStar{position:absolute;border-radius:50%;background:#fdfbff;opacity:0;animation:iIn .7s ease forwards}
+.iStar.big{box-shadow:0 0 16px 4px #ffffff7a}
+@keyframes iIn{from{opacity:0;transform:scale(.15)}to{opacity:.95;transform:scale(1)}}
+.iLine{position:absolute;left:0;right:0;text-align:center;color:#eadff8;font-size:clamp(15px,2.6vw,21px);letter-spacing:.16em;text-shadow:0 0 24px #b57ed66e;opacity:0;transform:translateY(14px);transition:opacity .9s ease,transform .9s ease;padding:0 20px}
+.iLine.on{opacity:1;transform:none}
+.iLine.l1{top:43%}
+.iLine.l2{top:53%;color:#d6c5ee}
+.iBrandBox{position:absolute;left:0;right:0;top:44%;text-align:center;opacity:0;transform:scale(.93);transition:opacity 1s ease,transform 1s ease}
+.iBrandBox.on{opacity:1;transform:scale(1)}
+.ibT{font-size:clamp(28px,5.4vw,48px);font-weight:850;letter-spacing:.1em;background:linear-gradient(120deg,#ffffff 10%,#ffd7e6 55%,#c9b3ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.iBrandBox small{display:block;margin-top:14px;font-size:clamp(12px,1.8vw,15px);color:#bfa9d6;letter-spacing:.55em;text-indent:.55em}
+.iSkip{position:absolute;right:24px;bottom:20px;color:#6f6187;font-size:12px;letter-spacing:.25em;border:0;background:none;cursor:pointer;z-index:2}
+.iSkip:hover{color:#cabfe0}
+@media(max-width:600px){.iSkip{right:16px}}
