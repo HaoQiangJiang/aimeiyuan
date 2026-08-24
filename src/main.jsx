@@ -270,7 +270,7 @@ function App(){
       </React.Fragment>})})()}
     </div>
     {admin&&<button className="primary add" onClick={()=>openEvent()}>＋ 添加回忆</button>}</div></section>
-   <MemoryWall photos={photos} admin={admin} onOpen={i=>setLb({list:photos,index:i})}/>
+   <MemoryWall photos={photos} admin={admin} onOpen={i=>setLb({list:photos,index:i})} onEdit={p=>openPhotoMeta(p)}/>
    <section id="places"><div className="wrap"><div className="head centerHead"><div><small>OUR PLACES</small><h2>我们去过的地方</h2></div><p>每颗爱心，都是现实世界里属于我们的坐标。</p></div>
     <div className="mapCard glass">
      {places.length>0?<>
@@ -354,6 +354,7 @@ function App(){
     <figure onClick={e=>e.stopPropagation()}>
      <img src={p.public_path} alt={p.title||""}/>
      <figcaption><b>{p.title||"我们的瞬间"}</b>{p.location?` · ${p.location}`:""}{p.caption?` — ${p.caption}`:""} · {lb.index+1}/{lb.list.length}</figcaption>
+     {admin&&<div className="ops center"><button onClick={()=>{setLb(null);openPhotoMeta(p)}}>✎ 编辑信息</button><button className="danger" disabled={busy} onClick={()=>delPhoto(p)}>删除照片</button></div>}
     </figure>
     {lb.list.length>1&&<button className="lbBtn next" onClick={e=>{e.stopPropagation();setLb({...lb,index:(lb.index+1)%lb.list.length})}}>›</button>}
    </div>})()}
@@ -398,7 +399,7 @@ function App(){
       {years.length>1&&<><span className="chipLbl">年份</span><button className={"chip"+(!fYear?" on":"")} onClick={()=>setFYear("")}>全部</button>{years.map(y=><button key={y} className={"chip"+(fYear===y?" on":"")} onClick={()=>setFYear(fYear===y?"":y)}>{y}</button>)}</>}
       {locs.length>0&&<><span className="chipLbl">地点</span>{locs.map(l=><button key={l} className={"chip"+(fLoc===l?" on":"")} onClick={()=>setFLoc(fLoc===l?"":l)}>{l}</button>)}</>}
      </div>}
-     {list.length>0?<div className="albumGrid">{list.map(p=><Ph key={p.id} src={p.public_path} cap={(p.title||"我们的瞬间")+(p.location?` · ${p.location}`:"")} onClick={()=>setLb({list:all,index:all.indexOf(p)})}/>)}</div>
+     {list.length>0?<div className="albumGrid">{list.map(p=><Ph key={p.id} src={p.public_path} cap={(p.title||"我们的瞬间")+(p.location?` · ${p.location}`:"")} badge={admin&&<button className="editBadge" onClick={e=>{e.stopPropagation();openPhotoMeta(p)}}>✎</button>} onClick={()=>setLb({list:all,index:all.indexOf(p)})}/>)}</div>
       :<p className="muted">{admin?"点击上方「上传到此分组」添加第一张照片 ♥":"照片即将上线，敬请期待 ♥"}</p>}
     </>})()}
 

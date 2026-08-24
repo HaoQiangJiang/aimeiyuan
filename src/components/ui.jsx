@@ -1,11 +1,11 @@
 import {useEffect,useRef,useState} from "react";
 import {toThumb} from "../api/loveApi.js";
 
-export function Ph({src,cap,onClick}){
+export function Ph({src,cap,onClick,badge}){
   const ref=useRef(null),[cur,setCur]=useState(()=>toThumb(src));
   useEffect(()=>{setCur(toThumb(src))},[src]);
   useEffect(()=>{const el=ref.current;if(el&&el.complete&&el.naturalWidth>0)el.closest(".phWrap").classList.add("ok")},[cur]);
-  return <span className="phWrap" data-cap={cap||""} onClick={onClick}><img ref={ref} src={cur} alt="" loading="lazy" decoding="async" onError={()=>{if(cur!==src)setCur(src)}} onLoad={e=>e.currentTarget.closest(".phWrap").classList.add("ok")}/></span>;
+  return <span className="phWrap" data-cap={cap||""} onClick={onClick}><img ref={ref} src={cur} alt="" loading="lazy" decoding="async" onError={()=>{if(cur!==src)setCur(src)}} onLoad={e=>e.currentTarget.closest(".phWrap").classList.add("ok")}/>{badge}</span>;
 }
 
 export function Chars({text,start=.25,step=.05}){
