@@ -7,8 +7,9 @@
 .albumGrid img{width:100%;break-inside:avoid;margin-bottom:12px;border-radius:16px;cursor:pointer;border:1px solid #ffffffcc;transition:transform .18s ease,box-shadow .18s ease}
 .albumGrid img:hover{transform:scale(1.02);box-shadow:0 18px 44px #5a30401f}
 .lightbox{position:fixed;inset:0;z-index:300;background:#20131af7;display:flex;align-items:center;justify-content:center;padding:34px}
-.lightbox figure{margin:0;text-align:center;max-width:min(1100px,92vw)}
-.lightbox img{max-width:min(1000px,92vw);max-height:76vh;border-radius:14px;box-shadow:0 40px 120px #00000080}
+.lightbox figure{margin:0;text-align:center;max-width:min(1100px,94vw)}
+.lightbox img{max-width:min(1000px,94vw);max-height:70vh;border-radius:14px;box-shadow:0 40px 120px #00000080}
+@media(max-width:640px){.lightbox{padding:16px}.lightbox img{max-height:62vh}}
 .lightbox figcaption{color:#f3dce6;margin-top:14px;font-size:15px;line-height:1.8}
 .lbBtn{position:fixed;z-index:301;width:52px;height:52px;border-radius:50%;border:1px solid #ffffff3d;background:#ffffff17;color:#fff;font-size:28px;cursor:pointer;display:grid;place-items:center;backdrop-filter:blur(8px);transition:.15s}
 .lbBtn:hover{background:#ffffff30;transform:scale(1.06)}
