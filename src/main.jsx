@@ -85,20 +85,29 @@ function Anniversary({emoji,name,month,day}){const info=useMemo(()=>annivInfo(mo
 
 const toThumb=p=>p&&p.startsWith("/photos/")?"/photos-thumb/"+p.slice(8):p;
 
-function Ph({src,alt,onClick}){const ref=useRef(null),[cur,setCur]=useState(()=>toThumb(src));
+function Ph({src,cap,onClick}){const ref=useRef(null),[cur,setCur]=useState(()=>toThumb(src));
  useEffect(()=>{setCur(toThumb(src))},[src]);
  useEffect(()=>{const el=ref.current;if(el&&el.complete&&el.naturalWidth>0)el.closest(".phWrap").classList.add("ok")},[cur]);
- return <span className="phWrap" onClick={onClick}><img ref={ref} src={cur} alt={alt||""} loading="lazy" onError={()=>{if(cur!==src)setCur(src)}} onLoad={e=>e.currentTarget.closest(".phWrap").classList.add("ok")}/></span>}
+ return <span className="phWrap" data-cap={cap||""} onClick={onClick}><img ref={ref} src={cur} alt="" loading="lazy" onError={()=>{if(cur!==src)setCur(src)}} onLoad={e=>e.currentTarget.closest(".phWrap").classList.add("ok")}/></span>}
 
 function CapCarousel({list,onOpen}){
  const [idx,setIdx]=useState(0),[pause,setPause]=useState(false);
- useEffect(()=>{if(pause||list.length<2)return;const t=setInterval(()=>setIdx(i=>(i+1)%list.length),3400);return()=>clearInterval(t)},[pause,list.length]);
- useEffect(()=>{setIdx(0)},[list.length]);
+ const len=list.length;
+ useEffect(()=>{if(pause||len<2)return;const t=setInterval(()=>setIdx(i=>(i+1)%len),3600);return()=>clearInterval(t)},[pause,len]);
+ useEffect(()=>{setIdx(0)},[len]);
+ const go=d=>setIdx(i=>(i+d+len)%len);
+ const th=p=>toThumb(p.public_path);
  return <div className="capCaro" onMouseEnter={()=>setPause(true)} onMouseLeave={()=>setPause(false)}>
-  {list.map((p,i)=><img key={p.id} className={"capPhoto caroImg"+(i===idx?" show":"")} src={toThumb(p.public_path)} onError={e=>{e.target.onerror=null;e.target.src=p.public_path}} alt={p.title||""} onClick={()=>onOpen(i)}/>)}
-  {list.length>1&&<>
+  {list.map((p,i)=><div key={p.id} className={"caroSlide"+(i===idx?" show":"")}>
+   <img className="caroBg" src={th(p)} alt="" aria-hidden="true"/>
+   <img className="caroMain" src={th(p)} onError={e=>{e.target.onerror=null;e.target.src=p.public_path}} alt={p.title||""} onClick={()=>onOpen(idx)}/>
+   <div className="capCaption"><b>{p.title||"我们的瞬间"}</b>{p.location?` · ${p.location}`:""}{p.event_date?` · ${p.event_date.replaceAll("-",".")}`:""}</div>
+  </div>)}
+  <button className="caroNav prev" onClick={e=>{e.stopPropagation();go(-1)}}>‹</button>
+  <button className="caroNav next" onClick={e=>{e.stopPropagation();go(1)}}>›</button>
+  {len>1&&<>
    <div className="capDots">{list.map((p,i)=><i key={p.id} className={i===idx?"on":""} onClick={e=>{e.stopPropagation();setIdx(i)}}/>)}</div>
-   <span className="caroNum">{idx+1}/{list.length}</span>
+   <span className="caroNum">{idx+1}/{len}</span>
   </>}
  </div>}
 
@@ -464,7 +473,7 @@ function App(){
       {years.length>1&&<><span className="chipLbl">年份</span><button className={"chip"+(!fYear?" on":"")} onClick={()=>setFYear("")}>全部</button>{years.map(y=><button key={y} className={"chip"+(fYear===y?" on":"")} onClick={()=>setFYear(fYear===y?"":y)}>{y}</button>)}</>}
       {locs.length>0&&<><span className="chipLbl">地点</span>{locs.map(l=><button key={l} className={"chip"+(fLoc===l?" on":"")} onClick={()=>setFLoc(fLoc===l?"":l)}>{l}</button>)}</>}
      </div>}
-     {list.length>0?<div className="albumGrid">{list.map(p=><Ph key={p.id} src={p.public_path} onClick={()=>setLb({list:all,index:all.indexOf(p)})}/>)}</div>
+     {list.length>0?<div className="albumGrid">{list.map(p=><Ph key={p.id} src={p.public_path} cap={(p.title||"我们的瞬间")+(p.location?` · ${p.location}`:"")} onClick={()=>setLb({list:all,index:all.indexOf(p)})}/>)}</div>
       :<p className="muted">{admin?"点击上方「上传到此分组」添加第一张照片 ♥":"照片即将上线，敬请期待 ♥"}</p>}
     </>})()}
 

@@ -34,8 +34,10 @@
 .phWrap.ok{animation:none;background:none}
 .phWrap.ok img{opacity:1}
 @keyframes shimmer{to{background-position:-200% 0}}
-.albumGrid .phWrap{break-inside:avoid;margin-bottom:12px;border:1px solid #ffffffcc;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+.albumGrid .phWrap{break-inside:avoid;margin-bottom:12px;border:1px solid #ffffffcc;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;position:relative}
 .albumGrid .phWrap:hover{transform:scale(1.02);box-shadow:0 18px 44px #5a30401f}
+.albumGrid .phWrap::after{content:attr(data-cap);position:absolute;left:0;right:0;bottom:0;padding:26px 10px 9px;color:#fff;font-size:12.5px;text-align:center;background:linear-gradient(transparent,#000000b0);opacity:0;transition:.28s ease;border-radius:0 0 14px 14px;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.albumGrid .phWrap:hover::after{opacity:1}
 @media(prefers-reduced-motion:reduce){[data-reveal].rp:not(.revealed){opacity:1;transform:none}.film.tlp:before{transform:translateX(0) scaleY(1)}.phWrap{animation:none}.phWrap img{opacity:1}}
 
 .film{position:relative;padding-left:38px}
@@ -57,18 +59,22 @@
 .nDesc{margin:12px 0 0;color:#75606b;line-height:1.95;max-width:540px;font-size:15px}
 .nSongHint{display:inline-flex;align-items:center;gap:6px;margin:14px 0 0;font-size:12.5px;color:#a98cc0;background:#f6effc;border:1px solid #e5d3f5;border-radius:999px;padding:4px 12px}
 .evActions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
-.filmNode .phWrap,.filmNode .thumbMore{width:116px;height:116px;border-radius:14px}
-.thumbStrip{display:flex;gap:9px;overflow-x:auto;padding:14px 2px 6px;scrollbar-width:thin}
-.thumbStrip .phWrap{flex:0 0 auto}
-.filmNode .phWrap img{filter:blur(16px) saturate(1.25);transform:scale(1.09);transition:filter 1s ease,opacity .55s ease,transform 1s ease}
+.filmNode .phWrap,.filmNode .thumbMore{height:118px;min-width:66px;border-radius:13px;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease,width .35s ease}
+.filmNode .phWrap:not(.ok){width:92px}
+.filmNode.revealed .phWrap.ok{width:auto}
+.filmNode .thumbMore{width:96px}
+.thumbStrip{display:flex;align-items:center;gap:9px;overflow-x:auto;padding:14px 2px 6px;scrollbar-width:thin}
+.thumbStrip .phWrap{flex:0 0 auto;border:1px solid #ffffffcc;overflow:hidden}
+.filmNode .phWrap img{filter:blur(16px) saturate(1.25);transform:scale(1.09);transition:filter 1s ease,opacity .55s ease,transform 1s ease;height:100%;object-fit:cover}
 .filmNode.revealed .phWrap.ok img{filter:none;transform:none}
+.filmNode.revealed .phWrap.ok:hover{transform:translateY(-5px) scale(1.05);box-shadow:0 16px 36px #d56e9a38;border-color:#ff9dbd;z-index:3}
 .filmNode .thumbStrip>*:nth-child(2){transition-delay:.15s}
 .filmNode .thumbStrip>*:nth-child(3){transition-delay:.3s}
 .filmNode .thumbStrip>*:nth-child(4){transition-delay:.45s}
 .filmNode .thumbStrip>*:nth-child(5){transition-delay:.6s}
 .filmNode .thumbStrip>*:nth-child(n+6){transition-delay:.75s}
 .evActions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-@media(max-width:760px){.film{padding-left:30px}.film:before{left:9px}.nodeDot{left:-29px;width:21px;height:21px;font-size:10px}.filmNode .phWrap,.filmNode .thumbMore{width:94px;height:94px}.yearMark{font-size:34px}}
+@media(max-width:760px){.film{padding-left:30px}.film:before{left:9px}.nodeDot{left:-29px;width:21px;height:21px;font-size:10px}.filmNode .phWrap,.filmNode .thumbMore{height:96px;min-width:56px}.filmNode .phWrap:not(.ok){width:74px}.yearMark{font-size:34px}}
 
 .filmNode.clickable{cursor:pointer}
 .nSongHint{margin:10px 0 0;font-size:12px;color:#a98cc0;letter-spacing:.1em}
@@ -79,10 +85,21 @@
 .capYear{display:inline-block;font-size:12px;letter-spacing:.4em;color:#bd718d;font-weight:800;text-indent:.4em}
 .capPhoto{display:block;width:100%;border-radius:16px;border:7px solid #fff;box-shadow:0 24px 56px #5a304022;cursor:pointer;transition:transform .2s ease}
 .capPhoto:hover{transform:scale(1.015)}
-.capCaro{position:relative;width:100%;aspect-ratio:4/3;border-radius:16px;overflow:hidden;border:7px solid #fff;box-shadow:0 24px 56px #5a304022;background:#f6ecf1}
-.capCaro .caroImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;border-radius:0;opacity:0;transition:opacity .9s ease,transform .25s ease;margin:0}
-.capCaro .caroImg.show{opacity:1}
-.capCaro:hover .caroImg.show{transform:scale(1.03)}
+.capCaro{position:relative;width:100%;aspect-ratio:16/10;border-radius:16px;overflow:hidden;border:7px solid #fff;box-shadow:0 24px 56px #5a304022;background:#171221}
+.caroSlide{position:absolute;inset:0;opacity:0;transition:opacity .95s ease}
+.caroSlide.show{opacity:1;z-index:1}
+.caroBg{position:absolute;left:-24px;top:-24px;width:calc(100% + 48px);height:calc(100% + 48px);object-fit:cover;filter:blur(26px) brightness(.5) saturate(1.25)}
+.caroMain{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;cursor:pointer}
+.caroSlide.show .caroMain{animation:kenburns 8s ease-out forwards}
+@keyframes kenburns{from{transform:scale(1)}to{transform:scale(1.055)}}
+.capCaption{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 11px;color:#fff;font-size:13px;text-align:center;background:linear-gradient(transparent,#000000b3);opacity:0;transform:translateY(8px);transition:.35s ease;z-index:2}
+.capCaro:hover .capCaption{opacity:1;transform:none}
+.capCaption b{margin-right:6px}
+.caroNav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;border:1px solid #ffffff59;background:#0000004d;color:#fff;font-size:20px;cursor:pointer;opacity:0;transition:.25s;z-index:3;backdrop-filter:blur(6px)}
+.caroNav:hover{background:#00000080;transform:translateY(-50%) scale(1.12)}
+.caroNav.prev{left:12px}.caroNav.next{right:12px}
+.capCaro:hover .caroNav{opacity:1}
+.caroNum{position:absolute;top:10px;right:10px;background:#00000073;color:#ffeef5;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums;backdrop-filter:blur(4px);z-index:3}
 .caroNum{position:absolute;top:10px;right:10px;background:#00000073;color:#ffeef5;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;font-variant-numeric:tabular-nums;backdrop-filter:blur(4px)}
 .capDots{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:6px;z-index:2}
 .capDots i{width:8px;height:8px;border-radius:50%;background:#ffffffb3;cursor:pointer;transition:.25s;box-shadow:0 1px 6px #00000040}
