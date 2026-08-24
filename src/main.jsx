@@ -149,9 +149,14 @@ function App(){
   }
   return d};
 
- const reload=async()=>{try{
-  const [s,e,p,st,pl,sg,wi]=await Promise.all([api("/api/settings"),api("/api/timeline"),api("/api/photos"),api("/api/stories"),api("/api/places"),api("/api/songs"),api("/api/wishes")]);
-  setSettings(s);setEvents(e);setPhotos(p);setStories(st);setPlaces(pl);setSongs(sg);setWishes(wi)}catch(e){}};
+ const reload=async()=>{const rs=await Promise.allSettled([api("/api/settings"),api("/api/timeline"),api("/api/photos"),api("/api/stories"),api("/api/places"),api("/api/songs"),api("/api/wishes")]);
+  if(rs[0].status==="fulfilled")setSettings(rs[0].value);
+  if(rs[1].status==="fulfilled")setEvents(rs[1].value);
+  if(rs[2].status==="fulfilled")setPhotos(rs[2].value);
+  if(rs[3].status==="fulfilled")setStories(rs[3].value);
+  if(rs[4].status==="fulfilled")setPlaces(rs[4].value);
+  if(rs[5].status==="fulfilled")setSongs(rs[5].value);
+  if(rs[6].status==="fulfilled")setWishes(rs[6].value);};
  useEffect(()=>{reload();
   if(TOKEN)fetch("/api/admin/check",{headers:{authorization:`Bearer ${TOKEN}`}}).then(r=>{
     if(r.ok)setAdmin(true);
@@ -255,10 +260,13 @@ function App(){
  /* ---------- 时间轴 ---------- */
  const openEvent=(ev={})=>{setForm(ev.id?{...ev}:{event_date:new Date().toISOString().slice(0,10),emoji:"",title:"",description:"",song:"",moment_time:"",moment_note:""});setModal({kind:"event",data:ev})};
  const openCapsule=eid=>setModal({kind:"capsule",data:eid});
+ const applyEventLocal=(id,patch)=>setEvents(es=>{const has=es.some(x=>x.id===id);return has?es.map(x=>x.id===id?{...x,...patch,id}:x):[...es,{...patch,id}]});
  const saveEvent=async()=>{try{setBusy(true);const {id}=modal.data;
   if(!form.event_date||!form.title)return alert("日期和标题不能为空");
-  await api(id?`/api/timeline/${id}`:"/api/timeline",{method:id?"PUT":"POST",body:JSON.stringify(form)});
-  notify(id?"回忆已更新 ♥":"新回忆已添加 ♥");setModal(null);reload()}catch(e){alert(e.message)}finally{setBusy(false)}};
+  const saved={event_date:form.event_date,title:form.title,description:form.description||"",emoji:form.emoji||"",song:form.song||"",moment_time:form.moment_time||"",moment_note:form.moment_note||""};
+  const r=await api(id?`/api/timeline/${id}`:"/api/timeline",{method:id?"PUT":"POST",body:JSON.stringify(saved)});
+  applyEventLocal(id||r.id,saved);
+  notify(id?"回忆已更新 ♥":"新回忆已添加 ♥");setModal(null);reload()}catch(e){alert((e.message||"网络异常")+"（若刚才显示已保存，内容不会丢失，刷新即可看到）")}finally{setBusy(false)}};
  const delEvent=async id=>{if(!confirm("确定删除这条回忆吗？"))return;try{await api(`/api/timeline/${id}`,{method:"DELETE"});notify("已删除");reload()}catch(e){alert(e.message)}};
 
  /* ---------- 故事 ---------- */
