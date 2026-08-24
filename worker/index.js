@@ -84,6 +84,27 @@ async function route(request, env) {
     const ok=((b.answer||"").trim().toLowerCase()===ans);
     return json({ok},ok?200:401);
   }
+  if(path==="/api/secret/contents" && method==="GET"){
+    const b=await request.json().catch(()=>({}));
+    const given=request.headers.get("x-secret")||"";
+    const row=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_a'").first();
+    const ans=(row?.value||"").trim().toLowerCase();
+    if(!ans || given.trim().toLowerCase()!==ans) return json({error:"locked"},401);
+    const {results}=await env.LOVE_DB.prepare("SELECT * FROM secret_contents ORDER BY created_at DESC").all();
+    return json(results);
+  }
+  if(res==="secret" && seg[2]==="contents" && method==="POST"){
+    if(!admin(request, env)) return json({error:"unauthorized"},401);
+    const nid=crypto.randomUUID();
+    await env.LOVE_DB.prepare("INSERT INTO secret_contents(id,type,title,content,media_path) VALUES(?,?,?,?,?)")
+      .bind(nid,b.type||"note",(b.title||"").slice(0,80),b.content||"",b.media_path||"").run();
+    return json({id:nid},201);
+  }
+  if(res==="secret" && seg[2]==="contents" && method==="DELETE" && seg[3]){
+    if(!admin(request, env)) return json({error:"unauthorized"},401);
+    await env.LOVE_DB.prepare("DELETE FROM secret_contents WHERE id=?").bind(seg[3]).run();
+    return json({ok:true});
+  }
   if(res==="timeline" && method==="GET"){
     const {results}=await env.LOVE_DB.prepare("SELECT * FROM timeline_events ORDER BY event_date ASC").all();
     return json(results);

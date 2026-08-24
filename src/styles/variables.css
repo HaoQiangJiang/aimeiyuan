@@ -1,0 +1,19 @@
+:root{
+  --bg:#FBF7F4;
+  --bg-soft:#fffdfc;
+  --text:#30282C;
+  --muted:#8d7a84;
+  --primary:#C98296;
+  --primary-deep:#a9647c;
+  --accent:#C8A66A;
+  --dark:#211A20;
+  --line:#ead9e0;
+  --card:rgba(255,255,255,.85);
+  --radius:20px;
+  --radius-sm:12px;
+  --fast:300ms;
+  --normal:600ms;
+  --slow:1000ms;
+  --ease:cubic-bezier(.25,.7,.25,1);
+  --shadow:0 22px 60px rgba(60,35,45,.10);
+}

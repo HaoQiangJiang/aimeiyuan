@@ -218,3 +218,45 @@
 .shakeTxt{text-align:center;color:#d56e9a;font-weight:800;font-size:13px;margin:10px 0 0;animation:shake .5s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media(max-width:760px){.event{padding:18px 16px}.toTop{right:16px;bottom:20px;width:44px;height:44px}.thumbStrip .phWrap,.thumbMore{width:88px;height:88px}}
+
+.loveBand{padding:34px 0;background:linear-gradient(180deg,#fff,var(--bg))}
+.loveBandIn{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.lbDays small{display:block;font-size:11px;letter-spacing:.3em;color:var(--muted);margin-bottom:6px}
+.lbDays b{font-size:44px;font-weight:900;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.lbDays span{font-size:16px;color:var(--primary-deep);font-weight:750;margin-left:6px}
+.polaroids{display:flex;flex-wrap:wrap;gap:28px 24px;justify-content:center}
+.polaroid{width:min(236px,42vw);background:#fff;padding:10px 10px 12px;border-radius:8px;box-shadow:0 18px 40px rgba(60,35,45,.14);transform:rotate(var(--r));cursor:pointer;transition:transform var(--fast) var(--ease),box-shadow var(--fast)}
+.polaroid:hover{transform:rotate(0deg) translateY(-8px) scale(1.04);position:relative;z-index:5;box-shadow:0 30px 70px rgba(60,35,45,.22)}
+.poloImg{display:block;height:186px;overflow:hidden;border-radius:4px;background:#f3e9ee}
+.polaroid img{width:100%;height:100%;object-fit:cover;display:block}
+.polaroid figcaption{padding:10px 4px 2px;text-align:center}
+.polaroid b{display:block;font-size:13.5px;color:var(--text)}
+.polaroid span{font-size:11.5px;color:var(--muted);letter-spacing:.08em}
+.seeAllWrap{text-align:center;margin-top:26px}
+.finTease{text-align:center;padding:90px 20px 70px;background:linear-gradient(180deg,var(--bg),#efe6f0)}
+.finTease p{color:var(--muted);letter-spacing:.2em;margin:0 0 18px}
+.finOpen{border:1px solid var(--line);background:#fff;color:var(--primary-deep);font-weight:800;font-size:15px;padding:14px 30px;border-radius:999px;cursor:pointer;transition:.3s}
+.finOpen:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.finOverlay{position:fixed;inset:0;z-index:500;background:#0a0710;display:flex;align-items:center;justify-content:center;text-align:center;padding:30px}
+.finClose{position:absolute;top:22px;right:26px;width:44px;height:44px;border-radius:50%;border:1px solid #ffffff3d;background:none;color:#cbb8dd;font-size:22px;cursor:pointer}
+.finStage{display:flex;flex-direction:column;align-items:center;gap:38px;max-width:680px}
+.fl{margin:0;color:#b9a8c9;font-size:clamp(15px,2.4vw,20px);letter-spacing:.3em;text-indent:.3em}
+.fl.l2{font-size:clamp(38px,7vw,60px);font-weight:900;color:#fff;letter-spacing:.12em}
+.fl.l3{color:#e5d8f2;font-size:clamp(16px,2.8vw,22px)}
+.flEnd{display:flex;flex-direction:column;align-items:center;gap:10px}
+.flEnd i{font-style:normal;font-size:32px;color:#ff5f93;animation:breathe 2.6s ease-in-out infinite}
+.flEnd b{font-size:clamp(24px,4vw,36px);color:#ffe3ee;letter-spacing:.3em;text-indent:.3em;font-weight:850}
+.finDates{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:8px;color:#b9a8c9;font-size:14px;font-variant-numeric:tabular-nums;letter-spacing:.2em}
+.finDates .forever{color:var(--accent);font-weight:900;letter-spacing:.4em}
+.flEnd small{margin-top:16px;color:#6f6187;font-size:11px;letter-spacing:.3em}
+.srGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:18px}
+.srCard{background:var(--bg-soft);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:left;min-height:110px;position:relative}
+.srCard.photo{padding:0;overflow:hidden}
+.srCard.photo img{width:100%;height:150px;object-fit:cover;display:block}
+.srCard.photo p{margin:8px 10px;font-size:12.5px;color:var(--muted)}
+.srType{display:block;font-size:10.5px;letter-spacing:.28em;color:var(--accent);font-weight:800;margin-bottom:8px}
+.srCard b{font-size:14px;color:var(--text)}
+.srCard p{margin:7px 0 0;color:#75606b;line-height:1.8;font-size:13px}
+.srDel{position:absolute;top:6px;right:8px;border:0;background:none;color:#cbb0bd;font-size:16px;cursor:pointer}
+@media(max-width:640px){.polaroids{gap:18px 14px}.polaroid{width:min(45vw,180px)}.poloImg{height:150px}.loveBandIn{justify-content:center;text-align:center}}
+@media(prefers-reduced-motion:reduce){.fl,.flEnd,.finLine{opacity:1!important;transform:none!important}}
