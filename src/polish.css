@@ -122,6 +122,8 @@
 .capFoot{text-align:center;color:#f0a9c3;margin-top:26px;font-size:11px;letter-spacing:.6em;text-indent:.6em}
 .formGrid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 @media(max-width:560px){.formGrid2{grid-template-columns:1fr}}
+@media(max-width:640px){.capCaro{aspect-ratio:1/1;border-width:5px}.capCaro:hover .caroMain{transform:none}.capCaption{font-size:12px}}
+@media(hover:none){.caroNav{opacity:.9;width:34px;height:34px;font-size:16px}.capCaption{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.eq i,.capHeart{animation:none}}
 
 .mapCard{position:relative;height:440px;border-radius:28px;background:#fffafc radial-gradient(#e9c9d838 1px,transparent 1.5px);background-size:26px 26px;overflow:hidden}

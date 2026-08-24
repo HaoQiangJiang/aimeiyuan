@@ -115,9 +115,12 @@ function Reel({children}){
  const ref=useRef(null);
  useEffect(()=>{
   const el=ref.current;if(!el)return;
-  let dir=1,id;
+  if(window.matchMedia&&window.matchMedia("(hover: none)").matches)return;
+  let dir=1,touchAt=0,id;
+  const ts=()=>{touchAt=Date.now()};
+  el.addEventListener("touchstart",ts,{passive:true});
   const tick=()=>{
-   if(el.scrollWidth>el.clientWidth+4&&!el.matches(":hover")){
+   if(el.scrollWidth>el.clientWidth+4&&!el.matches(":hover")&&Date.now()-touchAt>1200){
     el.scrollLeft+=dir*.55;
     if(el.scrollLeft+el.clientWidth>=el.scrollWidth-2)dir=-1;
     else if(el.scrollLeft<=1)dir=1;
@@ -125,7 +128,7 @@ function Reel({children}){
    id=requestAnimationFrame(tick);
   };
   id=requestAnimationFrame(tick);
-  return()=>cancelAnimationFrame(id);
+  return()=>{cancelAnimationFrame(id);el.removeEventListener("touchstart",ts)};
  },[]);
  return <div ref={ref} className="thumbStrip">{children}</div>}
 
