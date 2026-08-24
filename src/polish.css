@@ -261,3 +261,8 @@
 .srDel{position:absolute;top:6px;right:8px;border:0;background:none;color:#cbb0bd;font-size:16px;cursor:pointer}
 @media(max-width:640px){.polaroids{gap:18px 14px}.polaroid{width:min(45vw,180px)}.poloImg{height:150px}.loveBandIn{justify-content:center;text-align:center}}
 @media(prefers-reduced-motion:reduce){.fl,.flEnd,.finLine{opacity:1!important;transform:none!important}}
+
+.progWrap{margin-top:20px}
+.progBar{height:9px;border-radius:99px;background:#f0e4dc;overflow:hidden}
+.progBar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .35s var(--ease)}
+.progWrap span{display:block;margin-top:9px;font-size:12.5px;color:var(--muted);text-align:center;letter-spacing:.05em;font-variant-numeric:tabular-nums}

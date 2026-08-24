@@ -145,15 +145,38 @@ function App(){
    return new File([blob],file.name.replace(/\.[^.]+$/,"")+".jpg",{type:"image/jpeg"});
   }catch(e){return file}
  };
+ const [prog,setProg]=useState(null);
+ const xhrUpload=(path,payload,onPct)=>new Promise((ok,no)=>{
+  const x=new XMLHttpRequest();
+  x.open("POST",path);
+  x.setRequestHeader("content-type","application/json");
+  x.setRequestHeader("authorization",`Bearer ${getToken()}`);
+  x.upload.onprogress=e=>{if(e.lengthComputable)onPct(e.loaded/e.total)};
+  x.onload=()=>{let d={};try{d=JSON.parse(x.responseText)}catch(_){}
+   if(x.status>=200&&x.status<300)ok(d);else no(new Error(d.error||`请求失败(${x.status})`))};
+  x.onerror=()=>no(new Error("网络异常"));
+  x.send(JSON.stringify(payload));
+ });
+ const readB64=(f,onPct)=>new Promise((ok,err)=>{
+  const r=new FileReader();
+  r.onprogress=e=>{if(e.lengthComputable)onPct(e.loaded/e.total)};
+  r.onload=()=>ok(r.result.split(",")[1]);
+  r.onerror=err;r.readAsDataURL(f);
+ });
  const uploadPhoto=async()=>{try{
   if(!file)return alert("请先选择图片");
   setBusy(true);
+  setProg({t:"正在压缩照片…",v:4});
   let f=file;
   if(/\.(jpe?g|png|webp)$/i.test(f.name)){f=await compressImage(f);if(f!==file)notify("已自动压缩为适合网页的尺寸")}
-  const b64=await new Promise((ok,err)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(",")[1]);r.onerror=err;r.readAsDataURL(f)});
-  if(b64.length>30*1024*1024)return alert("照片过大（压缩后仍超过 22MB），请手动缩小后再试");
-  await api("/api/photos/upload",{method:"POST",body:JSON.stringify({filename:f.name,content:b64,...form})});
-  notify("照片已提交，正在自动部署（约 1 分钟后显示）");setModal(null);reload()}catch(e){alert(e.message)}finally{setBusy(false)}};
+  setProg({t:"读取文件…",v:12});
+  const b64=await readB64(f,v=>setProg({t:"读取文件…",v:12+Math.round(v*18)}));
+  if(b64.length>30*1024*1024){setProg(null);return alert("照片过大（压缩后仍超过 22MB），请手动缩小后再试")}
+  setProg({t:"上传中 0%",v:30});
+  await xhrUpload("/api/photos/upload",{filename:f.name,content:b64,...form},k=>setProg({t:`上传中 ${Math.round(k*100)}%`,v:30+Math.round(k*58)}));
+  setProg({t:"已提交，GitHub 自动部署中（约 1 分钟）…",v:100});
+  setTimeout(()=>{notify("照片已上线 ♥");setProg(null);setModal(null);reload()},1200);
+ }catch(e){setProg(null);alert(e.message)}finally{setBusy(false)}};
  const openPhotoMeta=p=>{setForm({title:p.title||"",caption:p.caption||"",event_date:p.event_date||"",event_id:p.event_id||"",location:p.location||""});setModal({kind:"photoMeta",data:p})};
  const savePhotoMeta=async()=>{try{setBusy(true);
   await api(`/api/photos/${modal.data.id}`,{method:"PUT",body:JSON.stringify(form)});
@@ -186,9 +209,13 @@ function App(){
  const uploadSong=async()=>{try{
   if(!file)return alert("请先选择音频文件");
   setBusy(true);
-  const b64=await new Promise((ok,err)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(",")[1]);r.onerror=err;r.readAsDataURL(file)});
-  await api("/api/songs/upload",{method:"POST",body:JSON.stringify({filename:file.name,content:b64,name:form.name||"",event_id:form.event_id||null})});
-  notify("歌曲已入库 ♫");setFile(null);setModal(null);reload()}catch(e){alert(e.message)}finally{setBusy(false)}};
+  setProg({t:"读取音频…",v:12});
+  const b64=await readB64(file,v=>setProg({t:"读取音频…",v:12+Math.round(v*18)}));
+  setProg({t:"上传中 0%",v:30});
+  await xhrUpload("/api/songs/upload",{filename:file.name,content:b64,name:form.name||"",event_id:form.event_id||null},k=>setProg({t:`上传中 ${Math.round(k*100)}%`,v:30+Math.round(k*58)}));
+  setProg({t:"已入库，部署中…",v:100});
+  setTimeout(()=>{notify("歌曲已入库 ♫");setProg(null);setFile(null);setModal(null);reload()},1200);
+ }catch(e){setProg(null);alert(e.message)}finally{setBusy(false)}};
  const delSong=async s=>{if(!confirm(`从歌单移除《${s.name}》？`))return;try{await api(`/api/songs/${s.id}`,{method:"DELETE"});notify("已移除");reload()}catch(e){alert(e.message)}};
 
  /* 愿望 */
@@ -450,7 +477,8 @@ function App(){
      <option value="">不关联</option>
      {events.map(ev=><option key={ev.id} value={ev.id}>{ev.emoji||"♥"} {ev.title}</option>)}
     </select>
-    <div className="ops"><button className="primary" disabled={busy} onClick={uploadSong}>{busy?"上传中…":"上传并部署"}</button></div></>}
+    {prog?<div className="progWrap"><div className="progBar"><i style={{width:prog.v+"%"}}/></div><span>{prog.t}</span></div>
+     :<div className="ops"><button className="primary" disabled={busy} onClick={uploadSong}>上传并部署</button></div>}</>}
 
    {modal.kind==="upload"&&<><h2>上传照片</h2>
     <p className="muted small">照片会先提交到 GitHub 仓库并触发自动部署（约 1 分钟），随后出现在所属回忆里。</p>
@@ -465,7 +493,8 @@ function App(){
     <label className="lbl">日期</label><input className="input" type="date" value={form.event_date||""} onChange={e=>setForm({...form,event_date:e.target.value})}/>
     <label className="lbl">地点（可选）</label><input className="input" placeholder="比如：天津" value={form.location||""} onChange={e=>setForm({...form,location:e.target.value})}/>
     <label className="lbl">想说的话</label><textarea className="input" rows={2} placeholder="给这张照片配一句话…" value={form.caption} onChange={e=>setForm({...form,caption:e.target.value})}/>
-    <div className="ops"><button className="primary" disabled={busy} onClick={uploadPhoto}>{busy?"上传中…":"上传并部署"}</button></div></>}
+    {prog?<div className="progWrap"><div className="progBar"><i style={{width:prog.v+"%"}}/></div><span>{prog.t}</span></div>
+     :<div className="ops"><button className="primary" disabled={busy} onClick={uploadPhoto}>上传并部署</button></div>}</>}
 
    {modal.kind==="photoMeta"&&<><h2>编辑照片信息</h2>
     <img className="modalImg slim" src={toThumb(modal.data.public_path)}/>
