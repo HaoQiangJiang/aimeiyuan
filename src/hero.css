@@ -1,4 +1,4 @@
-.hero.dark{background:#120e20;min-height:100svh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:90px 20px 70px;text-align:center}
+.hero.dark{background:#120e20;min-height:100vh;min-height:100svh;min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:calc(90px + var(--safe-top,0px)) 20px calc(70px + var(--safe-bottom,0px));text-align:center}
 .heroPhotoBg{position:absolute;inset:-12%;background-position:center;background-size:cover;background-repeat:no-repeat;filter:blur(64px) brightness(.85) saturate(1.15);opacity:.32;transform:scale(1.12)}
 .heroVeil{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(18,14,32,.1) 0%,rgba(18,14,32,.78) 58%,#120e20 92%),linear-gradient(180deg,rgba(18,14,32,.45),rgba(18,14,32,.15) 30%,rgba(18,14,32,.92) 96%)}
 .stars{position:absolute;inset:-6%;pointer-events:none}

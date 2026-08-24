@@ -9,7 +9,7 @@ function Stars(){
     d:Math.random()*6,dur:2.6+Math.random()*4,layer:"L"+Math.floor(Math.random()*3)
   })),[]);
   useEffect(()=>{
-    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+    if(window.matchMedia&&(window.matchMedia("(prefers-reduced-motion: reduce)").matches||window.matchMedia("(hover: none)").matches))return;
     const el=ref.current;if(!el)return;
     const mv=e=>{
       el.style.setProperty("--mx",(e.clientX/innerWidth-.5).toFixed(3));

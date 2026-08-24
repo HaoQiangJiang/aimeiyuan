@@ -18,6 +18,7 @@ import "./album.css";
 import "./polish.css";
 import "./hero.css";
 import "./intro.css";
+import "./styles/mobile.css";
 
 const fmtDate=s=>s?.replaceAll("-"," / ")||"";
 const dotDate=s=>s?s.replaceAll("-","."):"";

@@ -1,0 +1,65 @@
+:root{
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+}
+
+html{min-height:100%;width:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100%;width:100%;max-width:100%;overflow-x:clip}
+#root{min-height:100%;width:100%}
+img{max-width:100%}
+
+.nav{top:calc(14px + var(--safe-top))}
+.toTop{right:calc(16px + var(--safe-right));bottom:calc(20px + var(--safe-bottom))}
+.musicBtn{right:calc(16px + var(--safe-right));bottom:calc(88px + var(--safe-bottom))}
+.playerCard{right:calc(14px + var(--safe-right));bottom:calc(148px + var(--safe-bottom))}
+.lbBtn.close{top:calc(18px + var(--safe-top));right:calc(18px + var(--safe-right))}
+.finClose{top:calc(20px + var(--safe-top));right:calc(22px + var(--safe-right))}
+.modal{padding:calc(16px + var(--safe-top)) calc(16px + var(--safe-right)) calc(16px + var(--safe-bottom)) calc(16px + var(--safe-left))}
+.hero.dark{padding-top:calc(90px + var(--safe-top));padding-bottom:calc(70px + var(--safe-bottom))}
+
+.hero{min-height:100vh;min-height:100svh;min-height:100dvh}
+.hero.dark{min-height:100vh;min-height:100svh;min-height:100dvh}
+.lightbox img{max-height:70vh;max-height:70dvh}
+
+@media(max-width:767px){
+  html,body{overflow-x:clip}
+  .stars i{translate:none!important}
+  .heroPhotoBg{filter:blur(34px) brightness(.9) saturate(1.1)}
+  .glass{backdrop-filter:blur(8px)}
+  .playerCard,.capDots{backdrop-filter:none}
+  .polaroid{width:min(86vw,330px);max-width:100%}
+  .poloImg{height:min(52vw,210px)}
+  .desktop-parallax{transform:none!important}
+  .modalBox{width:min(94vw,650px)!important;padding:24px 18px!important}
+  .capCaro{border-width:5px;border-radius:13px}
+  .caroNav{width:34px;height:34px;font-size:16px;opacity:.9}
+  .capCaro:hover .caroMain{transform:none}
+  section{padding:56px 0}
+  .head h2{font-size:30px;letter-spacing:-.03em}
+  footer{padding-bottom:calc(40px + var(--safe-bottom))}
+}
+
+@media(max-width:390px){
+  .wrap{width:94vw}
+  .bigDays b{font-size:clamp(64px,25vw,92px)}
+  .nTitle{font-size:19px}
+  .clockRow span{padding:4px 7px}
+  .anniDays b{font-size:44px}
+}
+
+@media(hover:none){
+  .capCaption{opacity:1;transform:none}
+  .caroNav{opacity:.92;width:36px;height:36px;font-size:17px}
+  .albumGrid .phWrap::after{opacity:1;background:linear-gradient(transparent,#000000a0)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
