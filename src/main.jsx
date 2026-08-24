@@ -131,11 +131,28 @@ function App(){
 
  /* 照片 */
  const openUpload=(eid="")=>{setFile(null);setForm({title:"",caption:"",event_date:new Date().toISOString().slice(0,10),event_id:eid,location:""});setModal({kind:"upload"})};
+ const compressImage=async file=>{
+  try{
+   const bmp=await createImageBitmap(file);
+   const max=2000;let{width:w,height:h}=bmp;
+   if(w<=max&&h<=max&&file.size<=2211840)return file;
+   if(w>max){h=Math.round(h*max/w);w=max}
+   else{w=Math.round(w*max/h);h=max}
+   const c=document.createElement("canvas");c.width=w;c.height=h;
+   c.getContext("2d").drawImage(bmp,0,0,w,h);
+   const blob=await new Promise(ok=>c.toBlob(ok,"image/jpeg",.85));
+   if(!blob||blob.size>=file.size)return file;
+   return new File([blob],file.name.replace(/\.[^.]+$/,"")+".jpg",{type:"image/jpeg"});
+  }catch(e){return file}
+ };
  const uploadPhoto=async()=>{try{
   if(!file)return alert("请先选择图片");
   setBusy(true);
-  const b64=await new Promise((ok,err)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(",")[1]);r.onerror=err;r.readAsDataURL(file)});
-  await api("/api/photos/upload",{method:"POST",body:JSON.stringify({filename:file.name,content:b64,...form})});
+  let f=file;
+  if(/\.(jpe?g|png|webp)$/i.test(f.name)){f=await compressImage(f);if(f!==file)notify("已自动压缩为适合网页的尺寸")}
+  const b64=await new Promise((ok,err)=>{const r=new FileReader();r.onload=()=>ok(r.result.split(",")[1]);r.onerror=err;r.readAsDataURL(f)});
+  if(b64.length>30*1024*1024)return alert("照片过大（压缩后仍超过 22MB），请手动缩小后再试");
+  await api("/api/photos/upload",{method:"POST",body:JSON.stringify({filename:f.name,content:b64,...form})});
   notify("照片已提交，正在自动部署（约 1 分钟后显示）");setModal(null);reload()}catch(e){alert(e.message)}finally{setBusy(false)}};
  const openPhotoMeta=p=>{setForm({title:p.title||"",caption:p.caption||"",event_date:p.event_date||"",event_id:p.event_id||"",location:p.location||""});setModal({kind:"photoMeta",data:p})};
  const savePhotoMeta=async()=>{try{setBusy(true);
@@ -238,7 +255,7 @@ function App(){
        <article data-reveal className="filmNode clickable" onClick={()=>x.id&&openCapsule(x.id)}>
         <i className="nodeDot">{ico}</i>
         <div className="nodeBody">
-         {g.length>0&&<Reel>{g.slice(0,9).map((p,j)=><Ph key={p.id} src={p.public_path} onClick={e=>{e.stopPropagation();setLb({list:g,index:j})}}/>)}{g.length>9&&<span className="thumbMore">+{g.length-9}</span>}</Reel>}
+         {g.length>0&&<Reel>{g.map((p,j)=><Ph key={p.id} src={p.public_path} onClick={e=>{e.stopPropagation();setLb({list:g,index:j})}}/>)}</Reel>}
          <h3 className="nTitle"><Chars text={x.title}/>{g.length>0&&<em className="photoCount inline">📷 {g.length}</em>}</h3>
          <span className="nDate">{dotDate(x.event_date)}</span>
          <p className="nDesc">{x.description||"这一页还没有写字。"}</p>
