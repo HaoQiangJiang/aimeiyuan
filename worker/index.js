@@ -124,6 +124,7 @@ async function route(request, env) {
   }
   if(res==="secret" && seg[2]==="contents" && method==="POST"){
     if(!admin(request, env)) return json({error:"unauthorized"},401);
+    const b=await request.json().catch(()=>({}));
     const nid=crypto.randomUUID();
     await env.LOVE_DB.prepare("INSERT INTO secret_contents(id,type,title,content,media_path) VALUES(?,?,?,?,?)")
       .bind(nid,b.type||"note",(b.title||"").slice(0,80),b.content||"",b.media_path||"").run();
