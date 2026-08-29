@@ -78,6 +78,7 @@ function App(){
  const [secOk,setSecOk]=useState(()=>{try{return sessionStorage.getItem("oluSec")==="1"}catch(e){return false}});
  const [gateOk,setGateOk]=useState(()=>{try{return localStorage.getItem("oluGatePassed")==="1"}catch(e){return false}});
  const [secAns,setSecAns]=useState(""),[secErr,setSecErr]=useState(""),[secContents,setSecContents]=useState([]);
+ const [secQ,setSecQ]=useState("");
  const [intro,setIntro]=useState(()=>{
   try{if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return false;
    return !sessionStorage.getItem("oluIntroDone")}catch(e){return false}});
@@ -253,16 +254,12 @@ function App(){
  const loadSecretContents=async ans=>{try{
   const r=await fetch("/api/secret/contents",{headers:{"x-secret":ans}});
   if(r.ok)setSecContents(await r.json())}catch(e){}};
- const checkSecret=async()=>{try{setBusy(true);
+ const relock=()=>{try{sessionStorage.removeItem("oluSec");sessionStorage.removeItem("oluSecAns")}catch(e){}setSecOk(false);setModal(null);notify("已重新上锁 🔒")};
+ const loadSecretQ=async()=>{try{const cfg=await api("/api/secret/config");setSecQ(cfg.secret_q||"")}catch(e){}};
+ const checkSecret=async()=>{if(!secAns.trim())return;try{
   await api("/api/secret/check",{method:"POST",body:JSON.stringify({answer:secAns})});
   try{sessionStorage.setItem("oluSec","1");sessionStorage.setItem("oluSecAns",secAns)}catch(e){}
-  setSecOk(true);setModal({kind:"secretRoom"});loadSecretContents(secAns);notify("密码正确 ♥")}
-  catch(e){if(e.message==="not_set")alert("这颗胶囊还没有配置问题，请管理员先设置");
-   else if(e.message==="unauthorized"||e.message==="wrong"){setSecErr("再想想看 ♥");setTimeout(()=>setSecErr(""),2600)}
-   else if(e.message==="rate_limited")alert("尝试太频繁，请一分钟后再试");
-   else alert(e.message)}
-  finally{setBusy(false)}};
- const relock=()=>{try{sessionStorage.removeItem("oluSec");sessionStorage.removeItem("oluSecAns")}catch(e){}setSecOk(false);setModal(null);notify("已重新上锁 🔒")};
+  setSecOk(true);setModal({kind:"secretRoom"});loadSecretContents(secAns);notify("密码正确 ♥")}catch(e){setSecErr("答案不对，再想想 ♥")}};
  const openSecretEdit=async()=>{try{setBusy(true);
   const cfg=await api("/api/secret/config");
   setForm({sq:cfg.secret_q||"",sa:cfg.secret_a||"",sn:cfg.secret_note||""});
@@ -374,7 +371,7 @@ function App(){
    </div></section>
    <FinalReveal startDate={settings.start_date} today={todayStr}/>
   </main>
-  <footer>Made with ♥ for two · Our Little Universe · 我们爱的小宇宙<span className="secretDot" title="♡" onClick={()=>{if(secOk){setModal({kind:"secretRoom"});loadSecretContents(sessionStorage.getItem("oluSecAns")||"")}else{setSecAns("");setSecErr("");setModal({kind:"secretAsk"})}}}>♡</span></footer>
+  <footer>Made with ♥ for two · Our Little Universe · 我们爱的小宇宙<span className="secretDot" title="♡" onClick={()=>{if(secOk){setModal({kind:"secretRoom"});loadSecretContents(sessionStorage.getItem("oluSecAns")||"")}else{setSecAns("");setSecErr("");setModal({kind:"secretAsk"});loadSecretQ()}}}>♡</span></footer>
 
   {songs.length>0&&<>
    <audio ref={audioRef} preload="none" onEnded={()=>playSong(cur+1)}/>
@@ -420,7 +417,7 @@ function App(){
     <p className="muted">Token 只保存在当前浏览器。</p>
     <input className="input" type="password" placeholder={admin?"重新输入密钥可切换账号":"LOVE_ADMIN_TOKEN"} value={tokenInput} onChange={e=>setTokenInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/>
     <div className="ops"><button className="primary" disabled={busy} onClick={login}>{busy?"验证中…":"进入管理模式"}</button>{admin&&<button className="danger" onClick={logout}>退出管理</button>}</div>
-    {admin&&<div className="ops" style={{marginTop:12}}><button onClick={openGateEdit}>✎ 访问密码</button></div>}</>}
+    {admin&&<div className="ops" style={{marginTop:12}}><button onClick={openGateEdit}>✎ 访问密码</button><button onClick={async()=>{await loadSecretQ();const cfg=await api("/api/secret/config");setForm({sq:cfg.secret_q||"",sa:cfg.secret_a||"",sn:cfg.secret_note||""});setModal({kind:"secretEdit"})}}>✎ 密室设置</button>{secOk&&<button onClick={()=>{setModal({kind:"secretRoom"});loadSecretContents(sessionStorage.getItem("oluSecAns")||"")}}>查看密室</button>}</div>}</>}
 
    {modal.kind==="capsule"&&(function(){const ev=events.find(x=>x.id===modal.data)||{};const g=photosByEvent[ev.id]||[];
     return <>
@@ -458,6 +455,12 @@ function App(){
     </>})()}
 
    {/* 其余弹窗：event/story/readStory/upload/photoMeta/placeForm/place/musicUp/wishForm/letterEdit/admin/secret */}
+   {modal.kind==="secretAsk"&&<><h2>🔐 Secret Room</h2>
+    <p className="muted">{secQ||"请输入我们的秘密暗号"}</p>
+    <input className="input" value={secAns} onChange={e=>{setSecAns(e.target.value);setSecErr("")}} onKeyDown={e=>e.key==="Enter"&&checkSecret()} placeholder="输入答案…" autoFocus/>
+    {secErr&&<p className="gateErr">{secErr}</p>}
+    <div className="ops"><button className="primary" disabled={!secAns.trim()} onClick={checkSecret}>进入密室</button></div></>}
+
    {modal.kind==="secretRoom"&&<><div className="capHead"><i className="capHeart">♥</i><h2>🔐 Secret Room</h2><span className="capYear">只有我们知道</span></div>
     {admin&&<div className="ops center"><button onClick={openSecretEdit}>✎ 设置问题</button><button onClick={openSecretAdd}>＋ 存入新秘密</button></div>}
     {secContents.length===0&&<p className="capLine">{settings.secret_note?(settings.secret_note.split("\n").filter(Boolean).map((l,i)=><span key={i}>{l}<br/></span>)):("这里很安静，只放只属于我们两个人的东西。")}</p>}
