@@ -266,3 +266,16 @@
 .progBar{height:9px;border-radius:99px;background:#f0e4dc;overflow:hidden}
 .progBar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .35s var(--ease)}
 .progWrap span{display:block;margin-top:9px;font-size:12.5px;color:var(--muted);text-align:center;letter-spacing:.05em;font-variant-numeric:tabular-nums}
+
+.gateOverlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#2a1a28 0%,#1c1024 40%,#1a1028 100%);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.gateCard{max-width:420px;width:90vw;padding:48px 36px;text-align:center;border-radius:28px;background:rgba(255,255,255,.12)!important;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.18);box-shadow:0 32px 80px rgba(0,0,0,.35);animation:gateIn .6s var(--ease) both}
+@keyframes gateIn{from{opacity:0;transform:translateY(28px) scale(.96)}to{opacity:1;transform:none}}
+.gateQ{font-size:56px;margin:0 0 16px;filter:drop-shadow(0 2px 12px rgba(0,0,0,.25))}
+.gateLabel{font-size:18px;color:#fff;margin:0 0 24px;line-height:1.7;font-weight:500;letter-spacing:.02em}
+.gateInput{width:100%;padding:14px 18px;border:1px solid rgba(255,255,255,.25);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-size:16px;outline:none;text-align:center;letter-spacing:.06em;transition:.25s}
+.gateInput:focus{border-color:var(--primary);background:rgba(255,255,255,.14);box-shadow:0 0 0 3px rgba(201,130,150,.25)}
+.gateInput::placeholder{color:rgba(255,255,255,.4)}
+.gateErr{color:#f87171;font-size:13px;margin:12px 0 0;animation:shakeX .4s ease}
+.gateBtn{width:100%;margin-top:20px;padding:14px;font-size:16px;border-radius:14px;letter-spacing:.04em}
+@keyframes shakeX{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@media(max-width:480px){.gateCard{padding:36px 24px}.gateQ{font-size:44px}.gateLabel{font-size:16px}}

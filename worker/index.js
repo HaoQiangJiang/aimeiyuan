@@ -66,8 +66,25 @@ async function route(request, env) {
     return json({ok:true});
   }
 
+  if(path==="/api/gate/check"){
+    if(limited(request,"gate",6,60000)) return json({error:"rate_limited"},429);
+    const b=await request.json().catch(()=>({}));
+    const qRow=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='gate_q'").first();
+    if(!qRow) await env.LOVE_DB.prepare("INSERT INTO settings(key,value) VALUES('gate_q','九月一号是什么纪念日') ON CONFLICT(key) DO NOTHING").run();
+    const aRow=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='gate_a'").first();
+    if(!aRow) await env.LOVE_DB.prepare("INSERT INTO settings(key,value) VALUES('gate_a','领证纪念日') ON CONFLICT(key) DO NOTHING").run();
+    const ans=(aRow?.value||"领证纪念日").trim().toLowerCase();
+    if(!ans) return json({ok:true});
+    const ok=((b.answer||"").trim().toLowerCase()===ans);
+    return json({ok},ok?200:401);
+  }
+  if(path==="/api/gate/config"){
+    if(!admin(request, env)) return json({error:"unauthorized"},401);
+    const {results}=await env.LOVE_DB.prepare("SELECT key,value FROM settings WHERE key LIKE 'gate_%'").all();
+    return json(Object.fromEntries(results.map(x=>[x.key,x.value])));
+  }
   if(res==="settings" && method==="GET"){
-    const {results}=await env.LOVE_DB.prepare("SELECT key,value FROM settings WHERE key NOT LIKE 'secret_%'").all();
+    const {results}=await env.LOVE_DB.prepare("SELECT key,value FROM settings WHERE key NOT LIKE 'secret_%' AND key NOT LIKE 'gate_%'").all();
     return json(Object.fromEntries(results.map(x=>[x.key,x.value])));
   }
   if(path==="/api/secret/config"){

@@ -20,6 +20,23 @@ import "./hero.css";
 import "./intro.css";
 import "./styles/mobile.css";
 
+function Gate({onPass}){
+  const [q,setQ]=useState(""),[a,setA]=useState(""),[err,setErr]=useState(""),[busy,setBusy]=useState(false);
+  useEffect(()=>{api("/api/settings").then(s=>{if(s.gate_q)setQ(s.gate_q)}).catch(()=>{})},[]);
+  const submit=async()=>{if(!a.trim())return;try{setBusy(true);setErr("");
+   const r=await fetch("/api/gate/check",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({answer:a})});
+   const d=await r.json();if(d.ok){localStorage.setItem("oluGatePassed","1");onPass()}else setErr("答案不对，再想想 ♥")}catch(e){setErr("网络异常，请重试")}finally{setBusy(false)}};
+  return <div className="gateOverlay">
+   <div className="gateCard glass">
+    <div className="gateQ">🔐</div>
+    <p className="gateLabel">{q||"请回答问题"}</p>
+    <input className="gateInput" value={a} onChange={e=>{setA(e.target.value);setErr("")}} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="输入你的答案…" autoFocus/>
+    {err&&<p className="gateErr">{err}</p>}
+    <button className="primary gateBtn" disabled={busy||!a.trim()} onClick={submit}>{busy?"验证中…":"进入小宇宙 ♥"}</button>
+   </div>
+  </div>;
+}
+
 const fmtDate=s=>s?.replaceAll("-"," / ")||"";
 const dotDate=s=>s?s.replaceAll("-","."):"";
 const guessEmoji=t=>{t=t||"";return /领证|结婚|婚礼|婚戒/.test(t)?"💍":/旅行|旅游|出行|度假|海边|爬山|自驾/.test(t)?"✈️":/见面|初见|相识|第一次见/.test(t)?"🌸":/约会|电影|吃饭|晚餐|午餐|咖啡|逛街|游乐园/.test(t)?"🎬":/生日/.test(t)?"🎂":/纪念|周年/.test(t)?"🎉":/搬家|新家|同居|回家|装修/.test(t)?"🏠":/毕业|录取|入职|升职|offer/i.test(t)?"🎓":/宠物|猫|狗|毛孩子/.test(t)?"🐾":"♥"};
@@ -59,6 +76,7 @@ function App(){
  const [lb,setLb]=useState(null),[showTop,setShowTop]=useState(false),[navShow,setNavShow]=useState(false);
  const [letterOpen,setLetterOpen]=useState(false),[paperGo,setPaperGo]=useState(false);
  const [secOk,setSecOk]=useState(()=>{try{return sessionStorage.getItem("oluSec")==="1"}catch(e){return false}});
+ const [gateOk,setGateOk]=useState(()=>{try{return localStorage.getItem("oluGatePassed")==="1"}catch(e){return false}});
  const [secAns,setSecAns]=useState(""),[secErr,setSecErr]=useState(""),[secContents,setSecContents]=useState([]);
  const [intro,setIntro]=useState(()=>{
   try{if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return false;
@@ -252,6 +270,13 @@ function App(){
  const saveSecret=async()=>{try{setBusy(true);
   await api("/api/settings",{method:"PUT",body:JSON.stringify({secret_q:form.sq||"",secret_a:form.sa||"",secret_note:form.sn||""})});
   notify("秘密已封存 ♥");setModal(null)}catch(e){alert(e.message)}finally{setBusy(false)}};
+ const openGateEdit=async()=>{try{setBusy(true);
+  const cfg=await api("/api/gate/config");
+  setForm({gq:cfg.gate_q||"",ga:cfg.gate_a||""});
+  setModal({kind:"gateEdit"})}catch(e){alert(e.message)}finally{setBusy(false)}};
+ const saveGate=async()=>{try{setBusy(true);
+  await api("/api/settings",{method:"PUT",body:JSON.stringify({gate_q:form.gq||"",gate_a:form.ga||""})});
+  notify("访问密码已更新 ♥");setModal(null)}catch(e){alert(e.message)}finally{setBusy(false)}};
  const openSecretAdd=()=>{setForm({stype:"note",stitle:"",scontent:"",sphoto:""});setModal({kind:"secretAdd"})};
  const addSecretContent=async()=>{try{setBusy(true);
   await api("/api/secret/contents",{method:"POST",body:JSON.stringify({type:form.stype||"note",title:form.stitle||"",content:form.scontent||"",media_path:form.sphoto||""})});
@@ -265,6 +290,7 @@ function App(){
 
  return <div>
   {intro&&<Intro done={()=>{try{sessionStorage.setItem("oluIntroDone","1")}catch(e){};setIntro(false)}}/>}
+  {!gateOk&&<Gate onPass={()=>setGateOk(true)}/>}
   <nav className={"nav"+(navShow?" show":"")}><a className="brand" href="#">Our <span>♥</span> Universe<em>我们爱的小宇宙</em></a><div className="links"><a href="#timeline">人生胶片</a><a href="#wall">记忆墙</a><a href="#places">足迹</a><a href="#letter">信</a></div><button className="round" onClick={()=>setModal({kind:"admin"})}>{admin?"🔓":"⚙"}</button></nav>
   <main>
    <Hero couple={settings.couple_name||"Our Little Universe"} start={settings.start_date} heroBg={heroBg}/>
@@ -393,7 +419,8 @@ function App(){
     {admin&&<p className="okline">✓ 当前处于管理模式，可以编辑内容。</p>}
     <p className="muted">Token 只保存在当前浏览器。</p>
     <input className="input" type="password" placeholder={admin?"重新输入密钥可切换账号":"LOVE_ADMIN_TOKEN"} value={tokenInput} onChange={e=>setTokenInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&login()}/>
-    <div className="ops"><button className="primary" disabled={busy} onClick={login}>{busy?"验证中…":"进入管理模式"}</button>{admin&&<button className="danger" onClick={logout}>退出管理</button>}</div></>}
+    <div className="ops"><button className="primary" disabled={busy} onClick={login}>{busy?"验证中…":"进入管理模式"}</button>{admin&&<button className="danger" onClick={logout}>退出管理</button>}</div>
+    {admin&&<div className="ops" style={{marginTop:12}}><button onClick={openGateEdit}>✎ 访问密码</button></div>}</>}
 
    {modal.kind==="capsule"&&(function(){const ev=events.find(x=>x.id===modal.data)||{};const g=photosByEvent[ev.id]||[];
     return <>
@@ -466,6 +493,12 @@ function App(){
     <label className="lbl">正文（每行一句）</label><textarea className="input" rows={8} value={form.lb||""} onChange={e=>setForm({...form,lb:e.target.value})}/>
     <label className="lbl">落款（每行一行）</label><textarea className="input" rows={2} value={form.ls||""} onChange={e=>setForm({...form,ls:e.target.value})}/>
     <div className="ops"><button className="primary" disabled={busy} onClick={saveLetter}>{busy?"封存中…":"重新封好"}</button></div></>}
+
+   {modal.kind==="gateEdit"&&<><h2>✎ 访问密码</h2>
+    <p className="muted small">访客打开网站时需要回答此问题才能进入。</p>
+    <label className="lbl">问题</label><input className="input" placeholder="九月一号是什么纪念日" value={form.gq||""} onChange={e=>setForm({...form,gq:e.target.value})}/>
+    <label className="lbl">答案（不区分大小写）</label><input className="input" placeholder="领证纪念日" value={form.ga||""} onChange={e=>setForm({...form,ga:e.target.value})}/>
+    <div className="ops"><button className="primary" disabled={busy} onClick={saveGate}>{busy?"保存中…":"保存"}</button></div></>}
 
    {modal.kind==="musicUp"&&<><h2>上传歌曲</h2>
     <p className="muted small">音频会提交到 GitHub 仓库并自动部署（约 1 分钟后可播放）。</p>
