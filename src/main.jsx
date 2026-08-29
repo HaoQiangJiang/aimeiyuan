@@ -22,7 +22,7 @@ import "./styles/mobile.css";
 
 function Gate({onPass}){
   const [q,setQ]=useState(""),[a,setA]=useState(""),[err,setErr]=useState(""),[busy,setBusy]=useState(false);
-  useEffect(()=>{api("/api/settings").then(s=>{if(s.gate_q)setQ(s.gate_q)}).catch(()=>{})},[]);
+  useEffect(()=>{fetch("/api/gate/question").then(r=>r.json()).then(d=>{if(d.question)setQ(d.question)}).catch(()=>{})},[]);
   const submit=async()=>{if(!a.trim())return;try{setBusy(true);setErr("");
    const r=await fetch("/api/gate/check",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({answer:a})});
    const d=await r.json();if(d.ok){localStorage.setItem("oluGatePassed","1");onPass()}else setErr("答案不对，再想想 ♥")}catch(e){setErr("网络异常，请重试")}finally{setBusy(false)}};

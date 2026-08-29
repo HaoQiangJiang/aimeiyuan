@@ -78,6 +78,11 @@ async function route(request, env) {
     const ok=((b.answer||"").trim().toLowerCase()===ans);
     return json({ok},ok?200:401);
   }
+  if(path==="/api/gate/question"){
+    const row=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='gate_q'").first();
+    const q=row?.value||"九月一号是什么纪念日";
+    return json({question:q});
+  }
   if(path==="/api/gate/config"){
     if(!admin(request, env)) return json({error:"unauthorized"},401);
     const {results}=await env.LOVE_DB.prepare("SELECT key,value FROM settings WHERE key LIKE 'gate_%'").all();
