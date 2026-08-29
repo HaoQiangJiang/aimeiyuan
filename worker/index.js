@@ -94,14 +94,21 @@ async function route(request, env) {
   }
   if(path==="/api/secret/config"){
     if(!admin(request, env)) return json({error:"unauthorized"},401);
+    const qRow=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_q'").first();
+    if(!qRow) await env.LOVE_DB.prepare("INSERT INTO settings(key,value) VALUES('secret_q','我们第一次见面是在哪里？') ON CONFLICT(key) DO NOTHING").run();
+    const aRow=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_a'").first();
+    if(!aRow) await env.LOVE_DB.prepare("INSERT INTO settings(key,value) VALUES('secret_a','') ON CONFLICT(key) DO NOTHING").run();
     const {results}=await env.LOVE_DB.prepare("SELECT key,value FROM settings WHERE key LIKE 'secret_%'").all();
     return json(Object.fromEntries(results.map(x=>[x.key,x.value])));
   }
   if(path==="/api/secret/check"){
     if(limited(request,"sec",6,60000)) return json({error:"rate_limited"},429);
     const b=await request.json().catch(()=>({}));
-    const row=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_a'").first();
-    const ans=(row?.value||"").trim().toLowerCase();
+    const qRow=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_q'").first();
+    if(!qRow) await env.LOVE_DB.prepare("INSERT INTO settings(key,value) VALUES('secret_q','我们第一次见面是在哪里？') ON CONFLICT(key) DO NOTHING").run();
+    const aRow=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_a'").first();
+    if(!aRow) await env.LOVE_DB.prepare("INSERT INTO settings(key,value) VALUES('secret_a','') ON CONFLICT(key) DO NOTHING").run();
+    const ans=(aRow?.value||"").trim().toLowerCase();
     if(!ans) return json({error:"not_set"},404);
     const ok=((b.answer||"").trim().toLowerCase()===ans);
     return json({ok},ok?200:401);
