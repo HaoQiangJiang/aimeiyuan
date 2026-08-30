@@ -77,7 +77,7 @@ function App(){
  const [letterOpen,setLetterOpen]=useState(false),[paperGo,setPaperGo]=useState(false);
  const [secOk,setSecOk]=useState(()=>{try{return sessionStorage.getItem("oluSec")==="1"}catch(e){return false}});
  const [gateOk,setGateOk]=useState(()=>{try{return localStorage.getItem("oluGatePassed")==="1"}catch(e){return false}});
- const [secAns,setSecAns]=useState(""),[secErr,setSecErr]=useState(""),[secContents,setSecContents]=useState([]);
+ const [secAns,setSecAns]=useState(()=>{try{return sessionStorage.getItem("oluSecAns")||""}catch(e){return ""}}),[secErr,setSecErr]=useState(""),[secContents,setSecContents]=useState([]);
  const [secQ,setSecQ]=useState("");
  const [intro,setIntro]=useState(()=>{
   try{if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return false;
@@ -101,8 +101,9 @@ function App(){
    if(r.ok)setAdmin(true);
    else{notify("保存的密钥已失效，请重新登录管理员");setModal({kind:"admin"})}
   }).catch(()=>{})},[]);
- useEffect(()=>{if(intro){document.body.style.overflow="hidden";return}
+  useEffect(()=>{if(intro){document.body.style.overflow="hidden";return}
   document.body.style.overflow=""},[intro]);
+ useEffect(()=>{if(modal?.kind==="secretRoom"&&secOk)loadSecretContents()},[modal?.kind,secOk]);
  useEffect(()=>{const f=()=>{setShowTop(window.scrollY>600);setNavShow(window.scrollY>window.innerHeight*.72)};window.addEventListener("scroll",f,{passive:true});f();return()=>window.removeEventListener("scroll",f)},[]);
  useEffect(()=>{if(!lb)return;let sx=0;const h=e=>{if(e.key==="Escape")setLb(null);
   if(e.key==="ArrowRight")setLb(x=>({...x,index:(x.index+1)%x.list.length}));
@@ -251,8 +252,9 @@ function App(){
   notify("信已重新封好 ♥");setModal(null);reload()}catch(e){alert(e.message)}finally{setBusy(false)}};
 
  /* 秘密房间 */
- const loadSecretContents=async ans=>{try{
-  const r=await fetch("/api/secret/contents",{headers:{"x-secret":ans}});
+ const loadSecretContents=async(ans)=>{try{
+  const a=ans||secAns||sessionStorage.getItem("oluSecAns")||"";
+  const r=await fetch("/api/secret/contents",{headers:{"x-secret":a}});
   if(r.ok)setSecContents(await r.json())}catch(e){}};
  const relock=()=>{try{sessionStorage.removeItem("oluSec");sessionStorage.removeItem("oluSecAns")}catch(e){}setSecOk(false);setModal(null);notify("已重新上锁 🔒")};
  const loadSecretQ=async()=>{try{const cfg=await api("/api/secret/config");setSecQ(cfg.secret_q||"")}catch(e){}};
