@@ -51,7 +51,7 @@ export function CapCarousel({list,onOpen}){
     <button className="caroNav prev" onClick={e=>{e.stopPropagation();go(-1)}}>‹</button>
     <button className="caroNav next" onClick={e=>{e.stopPropagation();go(1)}}>›</button>
     {len>1&&<>
-      <div className="capProg" onClick={e=>{e.stopPropagation();const r=e.currentTarget.getBoundingClientRect();jump(Math.min(len-1,Math.max(0,Math.round(((e.clientX-r.left)/r.width)*len))))}}>
+      <div className="capProg" onClick={e=>{e.stopPropagation();const r=e.currentTarget.getBoundingClientRect();jump(Math.min(len-1,Math.max(0,Math.floor(((e.clientX-r.left)/r.width)*len))))}}>
         <i style={{width:`${((idx+1)/len)*100}%`}}/>
       </div>
       <span className="caroNum">{idx+1}/{len}</span>

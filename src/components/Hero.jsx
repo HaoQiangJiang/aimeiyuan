@@ -47,7 +47,7 @@ export default function Hero({couple,start,heroBg}){
     <div className="heroCore">
       <motion.div {...fade(.15)} className="heroHeart">♥</motion.div>
       <motion.p {...fade(.35)} className="eyebrow">{couple}</motion.p>
-      <motion.p {...fade(.55)} className="heroDate">{start.replaceAll("-",".")}</motion.p>
+      <motion.p {...fade(.55)} className="heroDate">{(start||"").replaceAll("-",".")}</motion.p>
       <motion.div {...fade(.75)} className="bigDays"><b>{disp.toLocaleString()}</b><span>DAYS</span></motion.div>
       <motion.p {...fade(1)} className="heroQuote">“我们的故事，还在继续。”</motion.p>
       <motion.a {...fade(1.25)} className="scrollCue" href="#timeline"><i>↓</i><span>开始我们的故事</span></motion.a>

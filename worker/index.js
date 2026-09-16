@@ -115,7 +115,7 @@ async function route(request, env) {
   }
   if(path==="/api/secret/contents" && method==="GET"){
     const b=await request.json().catch(()=>({}));
-    const given=request.headers.get("x-secret")||"";
+    const given=decodeURIComponent(request.headers.get("x-secret")||"");
     const row=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_a'").first();
     const ans=(row?.value||"").trim().toLowerCase();
     if(!ans || given.trim().toLowerCase()!==ans) return json({error:"locked"},401);
@@ -256,7 +256,7 @@ async function route(request, env) {
   }
   if(res==="songs" && method==="DELETE" && id){
     const row=await env.LOVE_DB.prepare("SELECT file_path FROM songs WHERE id=?").bind(id).first();
-    if(row) await ghDeleteFile(env,row.file_path.replace(/^\//,""));
+    if(row) await ghDeleteFile(env,"public"+row.file_path);
     await env.LOVE_DB.prepare("DELETE FROM songs WHERE id=?").bind(id).run();
     return json({ok:true});
   }

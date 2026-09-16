@@ -33,7 +33,7 @@ export default function FinalReveal({startDate,today}){
             <i>♥</i>
             <b>我爱你</b>
             <div className="finDates">
-              <span>{startDate.replaceAll("-",".")}</span>
+              <span>{(startDate||"").replaceAll("-",".")}</span>
               <em>↓</em>
               <span>{today}</span>
               <em>↓</em>

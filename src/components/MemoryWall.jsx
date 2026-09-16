@@ -17,6 +17,7 @@ export default function MemoryWall({photos,admin,onOpen,onEdit}){
           </figcaption>
         </figure>})}
     </div>
+    {photos.length===0&&<p className="empty">记忆墙还是空白的，贴上第一张相片吧 ♥</p>}
     {photos.length>18&&!all&&<div className="seeAllWrap"><button className="mini primary" onClick={()=>setAll(true)}>展开全部 {photos.length} 张</button></div>}
    </div></section>;
 }

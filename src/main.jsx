@@ -254,7 +254,7 @@ function App(){
  /* 秘密房间 */
  const loadSecretContents=async(ans)=>{try{
   const a=ans||secAns||sessionStorage.getItem("oluSecAns")||"";
-  const r=await fetch("/api/secret/contents",{headers:{"x-secret":a}});
+  const r=await fetch("/api/secret/contents",{headers:{"x-secret":encodeURIComponent(a)}});
   if(r.ok)setSecContents(await r.json())}catch(e){}};
  const relock=()=>{try{sessionStorage.removeItem("oluSec");sessionStorage.removeItem("oluSecAns")}catch(e){}setSecOk(false);setModal(null);notify("已重新上锁 🔒")};
  const loadSecretQ=async()=>{try{const cfg=await api("/api/secret/config");setSecQ(cfg.secret_q||"")}catch(e){}};
@@ -288,7 +288,7 @@ function App(){
  const heroBg=settings.hero_bg||"/photos/我们领证了/marriage-01.jpg";
 
  return <div>
-  {intro&&<Intro done={()=>{try{sessionStorage.setItem("oluIntroDone","1")}catch(e){};setIntro(false)}}/>}
+  {intro&&gateOk&&<Intro done={()=>{try{sessionStorage.setItem("oluIntroDone","1")}catch(e){};setIntro(false)}}/>}
   {!gateOk&&<Gate onPass={()=>setGateOk(true)}/>}
   <nav className={"nav"+(navShow?" show":"")}><a className="brand" href="#">Our <span>♥</span> Universe<em>我们爱的小宇宙</em></a><div className="links"><a href="#timeline">人生胶片</a><a href="#wall">记忆墙</a><a href="#places">足迹</a><a href="#letter">信</a></div><button className="round" onClick={()=>setModal({kind:"admin"})}>{admin?"🔓":"⚙"}</button></nav>
   <main>
