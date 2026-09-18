@@ -114,7 +114,6 @@ async function route(request, env) {
     return json({ok},ok?200:401);
   }
   if(path==="/api/secret/contents" && method==="GET"){
-    const b=await request.json().catch(()=>({}));
     const given=decodeURIComponent(request.headers.get("x-secret")||"");
     const row=await env.LOVE_DB.prepare("SELECT value FROM settings WHERE key='secret_a'").first();
     const ans=(row?.value||"").trim().toLowerCase();
@@ -199,7 +198,9 @@ async function route(request, env) {
   }
 
   if(res==="photos" && method==="POST" && id==="upload"){
-    const safe=(b.filename||"").toLowerCase().replace(/[^a-z0-9._-]+/g,"-").replace(/^[-.]+/,"").slice(0,80);
+    const _fnExt=(b.filename||"").match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase()||"";
+    const _fnBase=(b.filename||"").slice(0,(b.filename||"").length-_fnExt.length).toLowerCase().replace(/[^a-z0-9._-]+/g,"-").replace(/^[-.]+/,"").replace(/-+$/,"").slice(0,80-_fnExt.length)||"photo";
+    const safe=_fnBase+_fnExt;
     if(!/\.(jpe?g|png|webp|gif|avif)$/.test(safe)) return json({error:"仅支持 jpg/png/webp/gif/avif 图片"},400);
     if(!b.content || b.content.length>30*1024*1024) return json({error:"文件过大（上限约 22MB）"},413);
     const ghPath=`public/photos/${safe}`;
@@ -221,7 +222,8 @@ async function route(request, env) {
   if(res==="photos" && method==="DELETE" && id){
     const row=await env.LOVE_DB.prepare("SELECT public_path FROM photos WHERE id=?").bind(id).first();
     if(!row) return json({error:"not_found"},404);
-    const removed=await ghDeleteFile(env, `public${row.public_path}`);
+    const encodedPath="public"+row.public_path.split("/").map(s=>encodeURIComponent(s)).join("/");
+    const removed=await ghDeleteFile(env, encodedPath);
     if(!removed) return json({error:"仓库文件删除失败，请稍后重试"},502);
     await env.LOVE_DB.prepare("DELETE FROM photos WHERE id=?").bind(id).run();
     return json({ok:true, repo_file_removed:true});
@@ -244,7 +246,9 @@ async function route(request, env) {
     return json({ok:true});
   }
   if(res==="songs" && method==="POST" && id==="upload"){
-    const safe=(b.filename||"").toLowerCase().replace(/[^a-z0-9._-]+/g,"-").replace(/^[-.]+/,"").slice(0,80);
+    const _sfExt=(b.filename||"").match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase()||"";
+    const _sfBase=(b.filename||"").slice(0,(b.filename||"").length-_sfExt.length).toLowerCase().replace(/[^a-z0-9._-]+/g,"-").replace(/^[-.]+/,"").replace(/-+$/,"").slice(0,80-_sfExt.length)||"song";
+    const safe=_sfBase+_sfExt;
     if(!/\.(mp3|m4a|wav|ogg|flac)$/.test(safe)) return json({error:"仅支持 mp3/m4a/wav/ogg/flac 音频"},400);
     if(!b.content || b.content.length>40*1024*1024) return json({error:"文件过大（上限约 30MB）"},413);
     const ok=await ghPutFile(env,`public/music/${safe}`,b.content,`song: ${safe}`);

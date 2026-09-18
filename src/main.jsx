@@ -87,7 +87,6 @@ function App(){
  const counter=useLoveCounter(settings.start_date,{live:true});
  const TOKEN=getToken();
  const notify=m=>{setToast(m);setTimeout(()=>setToast(""),3200)};
- const apiP=(path,options={})=>api(path,options);
 
  const reload=async()=>{const rs=await Promise.allSettled([api("/api/settings"),api("/api/timeline"),api("/api/photos"),api("/api/stories"),api("/api/places"),api("/api/songs"),api("/api/wishes")]);
   if(rs[0].status==="fulfilled")setSettings(rs[0].value);
@@ -101,8 +100,8 @@ function App(){
    if(r.ok)setAdmin(true);
    else{notify("保存的密钥已失效，请重新登录管理员");setModal({kind:"admin"})}
   }).catch(()=>{})},[]);
-  useEffect(()=>{if(intro){document.body.style.overflow="hidden";return}
-  document.body.style.overflow=""},[intro]);
+  useEffect(()=>{if(intro&&gateOk){document.body.style.overflow="hidden";return}
+  document.body.style.overflow=""},[intro,gateOk]);
  useEffect(()=>{if(modal?.kind==="secretRoom"&&secOk)loadSecretContents()},[modal?.kind,secOk]);
  useEffect(()=>{const f=()=>{setShowTop(window.scrollY>600);setNavShow(window.scrollY>window.innerHeight*.72)};window.addEventListener("scroll",f,{passive:true});f();return()=>window.removeEventListener("scroll",f)},[]);
  useEffect(()=>{if(!lb)return;let sx=0;const h=e=>{if(e.key==="Escape")setLb(null);
